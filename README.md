@@ -1,2 +1,2 @@
 # Nothing here yet also
-conflict
+This is just a placeholder.
