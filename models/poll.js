@@ -61,7 +61,7 @@ const pollSchema = mongoose.Schema({
         required: true,
         default: false
     },
-    canAddSuggestions: {
+    canAddChoices: {
         type: Boolean,
         required: true,
         default: false
