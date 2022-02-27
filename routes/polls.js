@@ -34,6 +34,7 @@ router.get("/:id", getPoll, async (req, res) => {
 
 // Add poll
 router.post("/", async (req, res) => {
+	if (req.body === null) return res.status(400).json({ message: "Invalid input" });
     const newPoll = new Poll(req.body.pollData);
     try {
         const savedPoll = await newPoll.save();
@@ -57,6 +58,7 @@ router.delete("/:id", getPoll, async (req, res) => {
 
 // Vote on existing choice
 router.patch("/vote/:id/:choiceid", getPoll, async (req, res) => {
+	if (req.body === null) return res.status(400).json({ message: "Invalid input" });
     req.poll.choices.id(req.params.choiceid).voteCount++;
 
     try {
@@ -70,6 +72,7 @@ router.patch("/vote/:id/:choiceid", getPoll, async (req, res) => {
 
 // Add new choice
 router.patch("/add/:id", getPoll, async (req, res) => {
+	if (req.body === null) return res.status(400).json({ message: "Invalid input" });
     if (!req.body.pollData.choices) return res.status(400).json({ message: "Invalid input" });
 
     req.poll.choices.push(req.body.pollData.choices);
@@ -84,8 +87,10 @@ router.patch("/add/:id", getPoll, async (req, res) => {
 });
 
 // Remove vote from existing option
-router.patch("/vote/:id/:choiceid", getPoll, async (req, res) => {
-    req.poll.choices.id(req.params.choiceid).voteCount--;
+router.patch("/unvote/:id/:choiceid", getPoll, async (req, res) => {
+	if (req.poll.choices.id(req.params.choiceid).voteCount > 0) {
+		req.poll.choices.id(req.params.choiceid).voteCount--;
+	}
 
     try {
         const savedPoll = await req.poll.save();
