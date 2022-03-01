@@ -12,7 +12,27 @@ const getPoll = async (req, res, next) => {
     return res.status(500).json({ message: err.message });
   }
 
-  req.poll = poll;
+  const dateNow = new Date().toISOString();
+  if (dateNow > poll.startDate.toISOString()) {
+    poll.isStarted = true;
+  } else {
+    poll.isStarted = false;
+  }
+  if (poll.endDate) {
+    if (dateNow > poll.endDate.toISOString()) {
+      poll.isEnded = true;
+    } else {
+      poll.isEnded = false;
+    }
+  }
+
+  try {
+    const requestedPoll = await poll.save();
+    req.poll = requestedPoll;
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+
   next();
 };
 
@@ -46,21 +66,7 @@ router.get("/", async (req, res) => {
 
 // Get poll by id
 router.get("/:id", getPoll, async (req, res) => {
-  let requestedPoll = req.poll;
-  const dateNow = new Date().toISOString();
-  if (dateNow > requestedPoll.startDate.toISOString()) {
-    requestedPoll.isStarted = true;
-  } else {
-    requestedPoll.isStarted = false;
-  }
-  if (requestedPoll.endDate) {
-    if (dateNow > requestedPoll.endDate.toISOString()) {
-      requestedPoll.isEnded = true;
-    } else {
-      requestedPoll.isEnded = false;
-    }
-  }
-  res.json(requestedPoll);
+  res.json(req.poll);
 });
 
 // Add poll
@@ -94,12 +100,16 @@ router.patch("/vote/:id/:choiceid", getPoll, async (req, res) => {
     return res.status(400).json({ message: "Invalid input" });
   req.poll.choices.id(req.params.choiceid).voteCount++;
 
-  try {
-    const savedPoll = await req.poll.save();
-    res.status(201).json(savedPoll);
-    console.log("Vote added successfully...");
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+  if (req.poll.isStarted && !req.poll.isEnded) {
+    try {
+      const savedPoll = await req.poll.save();
+      res.status(201).json(savedPoll);
+      console.log("Vote added successfully...");
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  } else {
+    res.status(400).json({ message: "Voting is not allowed on this poll" });
   }
 });
 
@@ -112,12 +122,18 @@ router.patch("/add/:id", getPoll, async (req, res) => {
 
   req.poll.choices.push(req.body.pollData.choices);
 
-  try {
-    const savedPoll = await req.poll.save();
-    res.status(201).json(savedPoll);
-    console.log("Choice added successfully...");
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+  if (req.poll.isStarted && !req.poll.isEnded) {
+    try {
+      const savedPoll = await req.poll.save();
+      res.status(201).json(savedPoll);
+      console.log("Choice added successfully...");
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  } else {
+    res
+      .status(400)
+      .json({ message: "Adding choices is not allowed on this poll" });
   }
 });
 
@@ -127,12 +143,16 @@ router.patch("/unvote/:id/:choiceid", getPoll, async (req, res) => {
     req.poll.choices.id(req.params.choiceid).voteCount--;
   }
 
-  try {
-    const savedPoll = await req.poll.save();
-    res.status(201).json(savedPoll);
-    console.log("Vote removed successfully...");
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+  if (req.poll.isStarted && !req.poll.isEnded) {
+    try {
+      const savedPoll = await req.poll.save();
+      res.status(201).json(savedPoll);
+      console.log("Vote removed successfully...");
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  } else {
+    res.status(400).json({ message: "Unvoting is not allowed on this poll" });
   }
 });
 
