@@ -7,16 +7,20 @@ const getPoll = async (req, res, next) => {
   let poll;
   try {
     poll = await Poll.findById(req.params.id);
-    if (!poll) return res.status(400).json({ message: "Poll not found" });
+    if (!poll) return res.status(404).json({ message: "Poll not found" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 
   const dateNow = new Date().toISOString();
-  if (dateNow > poll.startDate.toISOString()) {
-    poll.isStarted = true;
+  if (poll.startDate) {
+    if (dateNow > poll.startDate.toISOString()) {
+      poll.isStarted = true;
+    } else {
+      poll.isStarted = false;
+    }
   } else {
-    poll.isStarted = false;
+    return res.status(400).json({ message: "Invalid input" });
   }
   if (poll.endDate) {
     if (dateNow > poll.endDate.toISOString()) {
