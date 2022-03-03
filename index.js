@@ -2,7 +2,7 @@ const express = require("express");
 try {
   require("dotenv").config();
 } catch {
-    console.log("dotenv skipped");
+  console.log("dotenv skipped");
 }
 const mongoose = require("mongoose");
 const cors = require("cors");
