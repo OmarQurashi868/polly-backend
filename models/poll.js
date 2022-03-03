@@ -39,8 +39,10 @@ const pollSchema = mongoose.Schema({
     },
     creationDate: {
         type: Date,
-        required: true,
-        default: Date.now
+        default: Date.now,
+        index: {
+            expires: "50d"
+        }
     },
     startDate: {
         type: Date,
