@@ -49,10 +49,12 @@ router.get("/", async (req, res) => {
     let requestedPolls = polls;
     for (const poll of requestedPolls) {
       const dateNow = new Date().toISOString();
-      if (dateNow > poll.startDate.toISOString()) {
-        poll.isStarted = true;
-      } else {
-        poll.isStarted = false;
+      if (poll.startDate) {
+        if (dateNow > poll.startDate.toISOString()) {
+          poll.isStarted = true;
+        } else {
+          poll.isStarted = false;
+        }
       }
       if (poll.endDate) {
         if (dateNow > poll.endDate.toISOString()) {
