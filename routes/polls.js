@@ -75,6 +75,23 @@ router.get("/:id", getPoll, async (req, res) => {
   res.json(req.poll);
 });
 
+// Access poll as admin
+router.get("/:id/:adminLink", getPoll, async (req, res) => {
+  try {
+    requestedPoll = await Poll.findOne({ _id: req.params.id }).select(
+      "+adminLink"
+    );
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+
+  if (req.params.adminLink === requestedPoll.adminLink) {
+    res.status(200).json(req.poll);
+  } else {
+    res.status(400).json({ message: "Incorrect admin link" });
+  }
+});
+
 // Add poll
 router.post("/", async (req, res) => {
   if (req.body === null)
