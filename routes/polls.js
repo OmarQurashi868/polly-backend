@@ -184,7 +184,7 @@ router.delete("/remove/:id/:choiceid", getPoll, async (req, res) => {
   try {
     await req.poll.choices.id(req.params.choiceid).remove();
     await req.poll.save();
-    res.json(req.poll);
+    res.status(201).json(req.poll);
     console.log("Choice removed successfully...");
   } catch (err) {
     res.status(400).json({ message: err.message });

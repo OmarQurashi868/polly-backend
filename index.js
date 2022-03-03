@@ -17,4 +17,6 @@ const pollsRouter = require("./routes/polls");
 app.use("/polls", pollsRouter);
 
 // Start listening
-app.listen(process.env.PORT, () => console.log(`Server is listening to port ${process.env.PORT}...`));
+app.listen(process.env.PORT, () =>
+  console.log(`Server is listening to port ${process.env.PORT}...`)
+);
