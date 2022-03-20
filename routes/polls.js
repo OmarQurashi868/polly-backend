@@ -88,7 +88,7 @@ router.get("/:id/:adminLink", getPoll, async (req, res) => {
   if (req.params.adminLink === requestedPoll.adminLink) {
     res.status(200).json(req.poll);
   } else {
-    res.status(400).json({ message: "Incorrect admin link" });
+    res.status(401).json({ message: "Incorrect admin link" });
   }
 });
 
