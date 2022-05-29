@@ -191,4 +191,8 @@ router.delete("/remove/:id/:choiceid", getPoll, async (req, res) => {
   }
 });
 
+router.get("/wakeup", async (req, res) => {
+  res.status(200).json({ message: "Awake!" })
+})
+
 module.exports = router;
